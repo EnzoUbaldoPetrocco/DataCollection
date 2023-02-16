@@ -10,13 +10,14 @@ images = []
 thresh = 0.99999
 
 def delete_all_equal_images(image_paths, similar_images, destination_folder):
-    counter = np.shape(similar_images)[0]
     images = []
     for img in image_paths:
         if img not in images:
+            cond = False
             for i in similar_images:
-                if img != i[1]:
-                    images.append(img)
+                    cond = cond or img == i[1]
+            if cond:
+                images.append(img)
 
     print(f'Number of images without the similar images: {np.shape(images)}')
 
@@ -26,47 +27,7 @@ def delete_all_equal_images(image_paths, similar_images, destination_folder):
 
     for i, img in enumerate(images):
         image = cv2.imread(str(img))
-        cv2.imwrite(destination_folder  + f'/image_{i}.jpeg', image)
-
-def user_selection(similar_images, destination_folder):
-    print('Here there are the comparings, if you press any key it does nothing: ')
-    counter = np.shape(similar_images)[0]
-    for i,j in similar_images:
-        image1 = cv2.imread(str(i))
-        image2 = cv2.imread(str(j))
-        plt.subplot(1,2,1),plt.imshow(cv2.cvtColor(image1, cv2.COLOR_BGR2RGB))
-        plt.subplot(1,2,1),plt.imshow(cv2.cvtColor(image2, cv2.COLOR_BGR2RGB))
-        print(f'{counter} images left')
-        choice1 = input('Do you want to keep both? (y/n): ')
-        if choice1 == 'n':
-            print(f'Left size: {np.shape(image1)}')
-            print(f'Right size: {np.shape(image2)}')
-            choice2 = input('Do you want to delete left or right? (l/r): ')
-            if choice2 == 'l':
-                deleted_image = i
-            if choice2 == 'r':
-                deleted_image = j
-            n_duplicated_elements = similar_images.count(deleted_image)
-            for i in range(n_duplicated_elements):
-                similar_images.remove(deleted_image)
-        counter = counter - 1
-    images = []
-    for i in similar_images:
-        for j in i:
-            if j not in images:
-                images.append(j)
-    print(f'Number of images without the similar images: {np.shape(images)}')
-
-    if not os.path.exists(destination_folder):
-            print(f'Making directory: {str(destination_folder)}')
-            os.makedirs(destination_folder)
-
-    for i, img in enumerate(images):
-        image = cv2.imread(str(img))
-        cv2.imwrite(destination_folder  + f'/image_{i}.jpeg', image)
-    
-
-        
+        cv2.imwrite(destination_folder  + f'/image_{i}.jpeg', image)        
     
 def extract_features(image_paths):
     global images
