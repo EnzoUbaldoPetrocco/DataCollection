@@ -164,7 +164,7 @@ class SimilarImages:
         print(f'Number of pairs of similar images: {np.shape(similar_images)}')
         return similar_images
 
-    def __init__(self):
+    def __init__(self, delete_all_images):
         
         n = int(input('Give me the number of paths you want to include: '))
         image_paths = []
@@ -203,5 +203,7 @@ class SimilarImages:
         else: 
             similar_images = self.color_histograms(image_paths)
             self.thresh = float(input('Enter the threshold param: '))
-        
-        self.delete_all_equal_images(image_paths, similar_images, destination_folder)
+
+            
+        if delete_all_images:
+            self.delete_all_equal_images(image_paths, similar_images, destination_folder)
