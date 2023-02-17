@@ -22,6 +22,8 @@ chinese_labels = ['chinese', 'lamp', 'china',
  'orientali', 'asiatica', 'asiatiche', 'asiatico',
  'antico', 'porcellana']
 
+turkish_labels = ['turkish', 'turkey', 'lamp', 'lamps', 'mosaic']
+
 class Scraping:
     def check_and_download(self, labels, download_path, element, context=' '):
         global count
@@ -104,6 +106,10 @@ class Scraping:
         elif standard_ds == 'French' or standard_ds == 'french':
             for i in french_labels:
                 labels.append(i)
+        elif standard_ds == 'Turkish' or standard_ds == 'turkish':
+            for i in turkish_labels:
+                labels.append(i)
+                
         query_strings = query.split(' ')
         context = query_strings[0]
         if len(query_strings)>1:
