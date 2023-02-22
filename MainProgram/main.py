@@ -5,9 +5,9 @@ import scraping
 import similar_images
 
 def menu():
-    x = input('1) Scraping\n 2) Deleting copies of images\n' +
-    '3) Comparing and deleting similar images\n 4) '+ 
-    'Remove Background\n 5) Labeling 6) Quit (default): ' )
+    x = input('1) Scraping\n2) Deleting copies of images\n' +
+    '3) Comparing and deleting similar images\n4) '+ 
+    'Remove Background \n5) Labeling \n6) Quit (default):\n ' )
     try:
         x = int(x)
     except:

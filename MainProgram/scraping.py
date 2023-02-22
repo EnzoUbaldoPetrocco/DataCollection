@@ -8,6 +8,7 @@ from unidecode import unidecode
 from datetime import datetime as dt
 from PIL import Image
 import io
+from selenium.webdriver.chrome.options import Options
 
 french_labels = ['french', 'lamp', 'france',
 'lamps', 'european', 'art deco', 'liberty', 
@@ -22,25 +23,43 @@ chinese_labels = ['chinese', 'lamp', 'china',
  'orientali', 'asiatica', 'asiatiche', 'asiatico',
  'antico', 'porcellana']
 
-turkish_labels = ['turkish', 'turkey', 'lamp', 'lamps', 'mosaic']
+turkish_labels = ['turkish', 'turkey', 'lamp', 'lamps', 
+'traditional', 'arabic', 'arabian', 'oriental', 'table',
+'mosaic', 'antique', 'turca', 'turche', 'lampada', 
+'lampade', 'tradizionale', 'araba', 'orientale', 'tavolo', 
+ 'antico']
+
+indian_carpet_labels = ['indian', 'home', 'decor', 'carpet',
+  'indiano', 'casa', 'traditional','rug', 'rugs',
+  'tappeto', 'tappeti' ]
+
+japanese_carpet_labels = ['japanese', 'home', 'decor', 'carpet',
+  'giapponese', 'casa', 'traditional','rug', 'rugs',
+  'tappeto', 'tappeti' ]
+
+scandinavian_carpet_labels = ['scandinavian', 'home', 'decor', 'carpet',
+  'scandinavo', 'casa', 'traditional','rug', 'rugs',
+  'tappeto', 'tappeti' ]
 
 class Scraping:
     def check_and_download(self, labels, download_path, element, context=' '):
-        global count
         image_url = element.get_attribute("src")
         if image_url and 'http' in image_url:  # check if we can download the image
             bool_down = False
-            for lbl in labels:
-                if lbl in unidecode(element.get_attribute('alt').casefold()):  # check if the image caption contains word label in a case and accent insensitive way
-                    bool_down = bool_down or True# check if the image caption contains word label in a case and accent insensitive way
+            inherence_words = str(unidecode(element.get_attribute('alt').casefold())).split(' ')
+            for word in inherence_words:
+                for lbl in labels:
+                    if lbl == word:  # check if the image caption contains word label in a case and accent insensitive way
+                        bool_down = bool_down or True# check if the image caption contains word label in a case and accent insensitive way
             if bool_down:
-                self.download_image(download_path, image_url, f'image_{context}_{count}.jpeg')
-                count += 1
+                print(self.download_image)
+                self.download_image(download_path, image_url, f'image_{context}_{self.count}.jpeg')
+                self.count += 1
 
     def scroll_down(self, wd, delay, times):
         for i in range(times):
             wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(10*delay)
+            time.sleep(8*delay)
 
     def scroll_up(self, wd, delay, times):
         for i in range(times):
@@ -59,7 +78,6 @@ class Scraping:
             image = Image.open(img_file)
             image = image.convert('RGB')
             file_pth = down_path + file_name
-
             with open(file_pth, 'wb') as file:
                 image.save(file, image_type)
 
@@ -97,9 +115,12 @@ class Scraping:
         for i in range(n_labels):
             labels.append(input('Enter the label: '))
         download_path = input('Enter the path where you want to download the image: ')
-        delay = 0.75
+        delay = 0.55
 
-        standard_ds = input('Are you searching for any specific dataset?:\n- Chinese;\n- French;\n')
+        standard_ds = input('Are you searching for any specific dataset?:'+
+        '\n- Chinese lamp;\n- French lamp;\n- Turkish lamp;\n' +
+        '- Indian carpet;\n- Japanese carpet;\n- Scandinavian carpet;\n' +
+        'Enter only the nationality')
         if standard_ds == 'Chinese' or standard_ds == 'chinese':
             for i in chinese_labels:
                 labels.append(i)
@@ -109,16 +130,30 @@ class Scraping:
         elif standard_ds == 'Turkish' or standard_ds == 'turkish':
             for i in turkish_labels:
                 labels.append(i)
-                
+        elif standard_ds == 'Indian' or standard_ds == 'indian':
+            for i in indian_carpet_labels:
+                labels.append(i)
+        elif standard_ds == 'Japanese' or standard_ds == 'japanese':
+            for i in japanese_carpet_labels:
+                labels.append(i)
+        elif standard_ds == 'Scandinavian' or standard_ds == 'scandinavian':
+            for i in scandinavian_carpet_labels:
+                labels.append(i)
+
         query_strings = query.split(' ')
         context = query_strings[0]
         if len(query_strings)>1:
             for string in query_strings[1:len(query_strings)]:
                 context = context + string
-
+        print(labels)
         # create Selenium web driver instance
-        driver = webdriver.Chrome()
-
+        chrome_options = Options()
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--ignore-gpu-blocklist")
+        chrome_options.add_argument("--enable-webgl-developer-extensions")
+        chrome_options.add_argument("--enable-webgl-draft-extensions")
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        driver = webdriver.Chrome(chrome_options=chrome_options)
         # navigato to google images and search for the desired query
         driver.get("https://www.google.it/imghp")
 
@@ -140,27 +175,27 @@ class Scraping:
         # scrool through the search results 
         # and click on an image to view the related images
 
-        scroll_down(driver, delay, int(m/10))
-        scroll_up(driver, delay, int(m/10))
+        self.scroll_down(driver, delay, int(m/10))
+        self.scroll_up(driver, delay, int(m/10))
         main_images = driver.find_elements(By.CLASS_NAME, "Q4LuWd")
         if download_path[-1] != '/':
             download_path = download_path + '/' 
         if not os.path.exists(download_path):
                     print(f'Making directory: {str(download_path)}')
                     os.makedirs(download_path)
-        count = 0
+        self.count = 0
         for i in range(m):
             try:
                 main_images[i].click()
             except:
                 try:
-                    scroll_down(driver, delay, 3)
-                    scroll_up(driver, delay, 3)
+                    self.scroll_down(driver, delay, 3)
+                    self.scroll_up(driver, delay, 3)
                     main_images = driver.find_elements(By.CLASS_NAME, "Q4LuWd")
                     main_images[i].click()
                 except:
                     try:
-                        next_page(driver, delay)
+                        self.next_page(driver, delay)
                         main_images = driver.find_elements(By.CLASS_NAME, "Q4LuWd")
                         driver.back()
                         main_images[i].click()
@@ -174,8 +209,8 @@ class Scraping:
             lat_bar = driver.find_element(By.CLASS_NAME, 'WSABTc.a0XzNd')
             lat_bar.click()
 
-            scroll_down(driver, delay, int(m/10))
-            scroll_up(driver, delay, int(m/10))
+            self.scroll_down(driver, delay, int(m/10))
+            self.scroll_up(driver, delay, int(m/10))
 
             suggested_images = driver.find_element(By.CLASS_NAME, 'MkRxHd.MIdC8d.jwwPNd')
             url_sugg_page = suggested_images.get_attribute('href')
@@ -187,14 +222,14 @@ class Scraping:
                 print('doesn''t open')
                 continue
 
-            scroll_down(driver, delay, int(n/10))
-            scroll_up(driver, delay, int(n/10))
+            self.scroll_down(driver, delay, int(n/10))
+            self.scroll_up(driver, delay, int(n/10))
 
             sug_images = driver.find_elements(By.CLASS_NAME, "Q4LuWd")
 
             for sug_image in sug_images[0:min(len(sug_images),n)]:
                 try:
-                    check_and_download(labels, download_path, sug_image, query)
+                    self.check_and_download(labels, download_path, sug_image, query)
                 except:
                     continue
 

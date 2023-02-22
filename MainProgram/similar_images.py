@@ -165,7 +165,7 @@ class SimilarImages:
         return similar_images
 
     def __init__(self, delete_all_images):
-        
+        equal_threshold = 0.999999
         n = int(input('Give me the number of paths you want to include: '))
         image_paths = []
         types = ('*.png', '*.jpg', '*.jpeg')
@@ -178,7 +178,7 @@ class SimilarImages:
         print('Selected among these methods for comparing similar images:')
         print('1) color_histograms\n2) global_feature_descriptors\n3) local_feature_descriptors')
         print('4) image_hashing\n5) image_feature_extraction')
-        x = input('Enter a number from 1 to 4 in order to decide which method is used (default: color_histograms)')
+        x = input('Enter a number from 1 to 4 in order to decide which method is used (default: color_histograms): ')
         try:
             x = int(x)
         except:
@@ -186,23 +186,36 @@ class SimilarImages:
 
         if not isinstance(x, str):
             if x == 2:
+                if delete_all_images:
+                    self.thresh = equal_threshold
+                else:
+                    self.thresh = float(input('Enter the threshold param: '))
                 similar_images = self.global_feature_descriptors(image_paths)
-                self.thresh = float(input('Enter the threshold param: '))
             elif x == 3:
+                if delete_all_images:
+                    self.thresh = equal_threshold
+                else:
+                    self.thresh = float(input('Enter the threshold param: '))
                 similar_images = self.local_feature_descriptors(image_paths)
-                self.thresh = float(input('Enter the threshold param: '))
             elif x == 4:
                 similar_images = self.image_hashing(image_paths)
             elif x == 5:
-                similar_images = self.image_feature_extraction(image_paths)
                 self.distance_comp = float(input('Enter the distance_comp param: '))
                 self.len_comp = float(input('Enter the length_comp param: '))
+                similar_images = self.image_feature_extraction(image_paths)
+                
             else:
+                if delete_all_images:
+                    self.thresh = equal_threshold
+                else:
+                    self.thresh = float(input('Enter the threshold param: '))
                 similar_images = self.color_histograms(image_paths)
-            self.thresh = float(input('Enter the threshold param: '))
         else: 
+            if delete_all_images:
+                self.thresh = equal_threshold
+            else:
+                self.thresh = float(input('Enter the threshold param: '))
             similar_images = self.color_histograms(image_paths)
-            self.thresh = float(input('Enter the threshold param: '))
 
             
         if delete_all_images:

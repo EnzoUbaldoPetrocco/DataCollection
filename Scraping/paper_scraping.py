@@ -22,6 +22,12 @@ chinese_labels = ['chinese', 'lamp', 'china',
  'orientali', 'asiatica', 'asiatiche', 'asiatico',
  'antico', 'porcellana']
 
+turkish_labels = ['turkish', 'turkey', 'lamp', 'lamps', 
+'traditional', 'arabic', 'arabian', 'oriental', 'table'
+'mosaic', 'antique', 'turca', 'turche', 'lampada', 
+'lampade', 'tradizionale', 'araba', 'orientale', 'tavolo', 
+ 'antico']
+
 def check_and_download(labels, download_path, element, context=' '):
     global count
     image_url = element.get_attribute("src")
@@ -94,15 +100,18 @@ else:
 for i in range(n_labels):
     labels.append(input('Enter the label: '))
 download_path = input('Enter the path where you want to download the image: ')
-delay = 0.75
+delay = 0.8
 
-standard_ds = input('Are you searching for any specific dataset?:\n- Chinese;\n- French;\n')
+standard_ds = input('Are you searching for any specific dataset?:\n- Chinese;\n- French;\n- Turkish;')
 if standard_ds == 'Chinese' or standard_ds == 'chinese':
     for i in chinese_labels:
         labels.append(i)
 elif standard_ds == 'French' or standard_ds == 'french':
     for i in french_labels:
         labels.append(i)
+elif standard_ds == 'Turkish' or standard_ds == 'turkish':
+            for i in turkish_labels:
+                labels.append(i)
 query_strings = query.split(' ')
 context = query_strings[0]
 if len(query_strings)>1:
