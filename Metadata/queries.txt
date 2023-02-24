@@ -1,0 +1,35 @@
+	LAMPS
+
+french: 
+- french lamp
+- french table lamp
+- french lamps
+- lampada francese
+- lampade francesi
+
+chinese: 
+- chinese lamp
+- chinese table lamp
+
+turkish
+- mosaic turkish lamp
+- turkish lamp
+
+m = 80
+n = 50
+
+--------------------------
+
+	CARPET
+
+indian: 
+- traditional indian house with carpet
+- traditional indian house floor
+
+japanese: 
+- traditional japanese house with carpet
+- traditional japanese house floor
+
+scandinavian: 
+- traditional scandinavian house with carpet
+- traditional scandinavian house floor

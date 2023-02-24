@@ -100,7 +100,7 @@ class Scraping:
             n = int(n)
         m = input('Enter the number of images to scroll: (default = 30) ')
         if m == '0' or not m:
-            m = 55
+            m = 30
         else:
             m = int(n)
         query = input('Enter the query: ')
@@ -120,7 +120,7 @@ class Scraping:
         standard_ds = input('Are you searching for any specific dataset?:'+
         '\n- Chinese lamp;\n- French lamp;\n- Turkish lamp;\n' +
         '- Indian carpet;\n- Japanese carpet;\n- Scandinavian carpet;\n' +
-        'Enter only the nationality')
+        'Enter only the nationality: \n')
         if standard_ds == 'Chinese' or standard_ds == 'chinese':
             for i in chinese_labels:
                 labels.append(i)
@@ -229,7 +229,7 @@ class Scraping:
 
             for sug_image in sug_images[0:min(len(sug_images),n)]:
                 try:
-                    self.check_and_download(labels, download_path, sug_image, query)
+                    self.check_and_download(labels, download_path, sug_image, context)
                 except:
                     continue
 

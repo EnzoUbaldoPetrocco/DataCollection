@@ -30,7 +30,7 @@ while(enter):
         crop.Crop()
     elif x == 4:
         y = int(input('Automated mode (0/1) (takes as input all the image\n' + 
-        ' when you want to use the grab cut algorithm):'))
+        ' when you want to use the grab cut algorithm): '))
         remove_bg.RemoveBackGround(y)
     elif x == 5:
         labeling.Labeling()
