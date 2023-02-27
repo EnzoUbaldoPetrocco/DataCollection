@@ -25,11 +25,17 @@ n = 50
 indian: 
 - traditional indian house with carpet
 - traditional indian house floor
+- traditional indian house interior
 
 japanese: 
 - traditional japanese house with carpet
 - traditional japanese house floor
+- traditional japanese house interior
 
 scandinavian: 
 - traditional scandinavian house with carpet
 - traditional scandinavian house floor
+- traditional scandinavian house interior
+
+m = 90
+n = 60
