@@ -9,67 +9,14 @@ from matplotlib.widgets import Slider, Button
 import matplotlib.patches as patches
 from matplotlib import animation
 import os
+from copy import deepcopy
 
 
 class RemoveBackGround:
     # Manual Background Removing
     def slider_update(self,val):
             self.amplitude = int(self.slider.val * 2)
-    def alternative_draw_discrete_circle_with_boundaries(self,x,y,r, xmax, ymax):
-        # Algorithm: 
-        # - start from (x,y)
-        # - go left of r positions.
-        # - go up-right until x_i = x
-        # - go down right until y_i = y
-        # - go down left until x_i = x
-        # - go up left until y_i = y
-        # - go right of one step, is it x_i=x?
-        # - if yes stop, else repeat
-        # - At the end, check which indices are out of range
-        indices = []
-        temp_indices = []
-        x = int(x)
-        y = int(y)
-        temp_indices.append([x,y])
-        cond = True
-        x_i = x-r
-        y_i = y
-        print(f'\nx is {x} and y is {y}')
-        print(f'r is {r}')
-        print(f'x_i is {x_i} and y_i is {y_i}')
-        temp_indices.append([x_i, y_i])
-        while(cond):
-            while(x_i!=x):
-                x_i = x_i + 1
-                y_i = y_i + 1
-                print(f'x_i is {x_i} and y_i is {y_i}')
-                temp_indices.append([x_i,y_i])
-            while(y_i!=y):
-                x_i = x_i + 1
-                y_i = y_i - 1
-                print(f'x_i is {x_i} and y_i is {y_i}')
-                temp_indices.append([x_i,y_i])
-            while(x_i!=x):
-                x_i = x_i - 1
-                y_i = y_i - 1
-                print(f'x_i is {x_i} and y_i is {y_i}')
-                temp_indices.append([x_i,y_i])
-            while(y_i!=y):
-                x_i = x_i - 1
-                y_i = y_i + 1
-                print(f'x_i is {x_i} and y_i is {y_i}')
-                temp_indices.append([x_i,y_i])
-            x_i = x_i + 1
-            print(f'x_i is {x_i} and y_i is {y_i}')
-            temp_indices.append([x_i,y_i])
-            cond = x_i < x
-            print(f'cond is {cond}')
-        for i in temp_indices:
-            if i[0]>0 and i[0]<xmax and i[1]>0 and i[1]<ymax:
-                indices.append([i[0], i[1]])
-        print('here')
-        return indices
-            
+
     def draw_discrete_circle_with_boundaries(self,x,y,r, xmax, ymax):
         # Algorithm: 
         # - check which indeces falls in the equation:
@@ -89,10 +36,12 @@ class RemoveBackGround:
         return indices
             
     def reset(self, event):
-        self.dummy = self.image
+        self.dummy = deepcopy(self.image)
+        print('Reset')
 
     def mouse_click(self, event):
             self.mouse = True
+
     def mouse_release(self, event):
             self.mouse = False
     
@@ -114,10 +63,10 @@ class RemoveBackGround:
         mean_slider_value = 5
         self.x, self.y = -mean_slider_value*2,-mean_slider_value*2
         self.amplitude = int(mean_slider_value * 2)
+        self.image = image
+        self.dummy = deepcopy(self.image)   
         plt.ion()
         self.fig = plt.figure()
-        self.image = image
-        self.dummy = self.image      
         plt.subplots_adjust(bottom=0.35)
         self.im = plt.imshow(self.dummy, animated = True)
         # Slider to control the dimension of the bg remover
@@ -126,13 +75,11 @@ class RemoveBackGround:
         self.slider.on_changed(self.slider_update)
         # Button to reset the image
         resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
-        button = Button(resetax, 'Reset', color='gold',
-                hovercolor='skyblue')
+        button = Button(resetax, 'Reset', color='blue',
+                hovercolor='red')
         button.on_clicked(self.reset)
-        ani = animation.FuncAnimation(self.fig, self.updatefig, interval=50, blit=True)
-        # Initialize the image and the dummy image
-          
-        # Tie the callback with the mouse click
+        ani = animation.FuncAnimation(self.fig, self.updatefig, interval=50, blit=True)          
+        # Tie the callbacks with the mouse click
         cid = self.fig.canvas.mpl_connect('button_press_event', self.mouse_click)
         self.fig.canvas.mpl_connect('button_release_event', self.mouse_release)
         plt.connect('motion_notify_event', self.mouse_move)
@@ -140,8 +87,6 @@ class RemoveBackGround:
         plt.close()
         plt.ioff()
     
-
-
     # Background Removing Algorithms
     def add_blank_screen(self, foreground, img):
         foreground = 1 -  foreground
