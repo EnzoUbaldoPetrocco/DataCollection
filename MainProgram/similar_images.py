@@ -9,7 +9,7 @@ from PIL import Image
 images = []
 # Expression of similarity threshold (the more are similar, the higher the value)
 # must be: 0 < thresh < 1
-thresh = 0.99999
+thresh = 0.999
 distance_comp = 0.75
 len_comp = 10
 
@@ -236,7 +236,7 @@ class SimilarImages:
         return similar_images
 
     def __init__(self, delete_all_images):
-        equal_threshold = 0.99999
+        equal_threshold = 0.999
         n = int(input('Give me the number of paths you want to include: '))
         image_paths = []
         types = ('*.png', '*.jpg', '*.jpeg')

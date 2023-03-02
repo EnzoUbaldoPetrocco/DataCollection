@@ -12,6 +12,7 @@ class Crop:
     def save_image(self, image, file_name, count):
         file_name = file_name.split('.')[0] + f'_{count}.' + file_name.split('.')[1] 
         cv2.imwrite(file_name, image)
+        print('Image saved!')
 
 
     def mouse_event(self, event):
@@ -21,7 +22,7 @@ class Crop:
 
     def cursor_crop(self, image, file_name):
         global count
-        plt.rcParams["figure.figsize"] = [12.0, 7.0]
+        plt.rcParams["figure.figsize"] = [10.0, 6.0]
         plt.rcParams["figure.autolayout"] = True
 
         fig = plt.figure()
@@ -33,7 +34,7 @@ class Crop:
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)),plt.grid(),plt.ion(),plt.show()
         crop = 1
 
-        choice1 = input('Would you like to crop this image? (0/1)\n')
+        choice1 = input('Would you like to crop this image? (0/1)  ')
         try:
             choice1 = int(choice1)
             if choice1!=1:
@@ -81,7 +82,7 @@ class Crop:
 
                 like = input('Do you like this cut? (y/n) ')
                 plt.close()
-                if like == 'y':
+                if like == 'y' or like == '1':
                     # Crop the image
                     cropped_img = img[int(y1):int(y2), int(x1):int(x2)]
                     count = count + 1
@@ -110,7 +111,7 @@ class Crop:
         img = cv2.imread(str(image))
         plt.imshow(img),plt.grid(),plt.ion(),plt.show()
         crop = 1
-        choice1 = input('Would you like to crop this image? (0/1)\n')
+        choice1 = input('Would you like to crop this image? (0/1)  ')
         try:
             choice1 = int(choice1)
             if choice1!=1:
@@ -185,7 +186,7 @@ class Crop:
         for i in range(n):
             path = input('Enter the path: ')
             for typ in types:
-                image_paths.extend(pathlib.Path(path).glob(typ))
+                image_paths.extend(sorted(pathlib.Path(path).glob(typ)))
         destination_folder = input('Enter the destination folder: ')
 
         if not os.path.exists(destination_folder):
@@ -193,8 +194,9 @@ class Crop:
                 os.makedirs(destination_folder)
 
         
-        count = 0
-        for im in image_paths:
+        count = 1373
+        for i, im in enumerate(image_paths):
+            print(f'Image number {i}')
             if cursor_mode:
                 self.cursor_crop(im, destination_folder +  f'/image.jpeg')
             else:
