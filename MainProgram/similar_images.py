@@ -5,6 +5,9 @@ from matplotlib import pyplot as plt
 import os
 import imagehash
 from PIL import Image
+import sys
+sys.path.insert(1, '../')
+import Utils.utils
 
 images = []
 # Expression of similarity threshold (the more are similar, the higher the value)
@@ -243,7 +246,7 @@ class SimilarImages:
         for i in range(n):
             path = input('Enter the path: ')
             for typ in types:
-                image_paths.extend(pathlib.Path(path).glob(typ))
+                image_paths.extend(sorted(pathlib.Path(path).glob(typ)))
         destination_folder = input('Enter the destination folder: ')
         if not os.path.exists(destination_folder):
                 print(f'Making directory: {str(destination_folder)}')

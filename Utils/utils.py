@@ -20,17 +20,18 @@ def options(options):
     if len(options) == 0:
         raise Exception('Options has length 0')
     print('Which one would you like to choose?')
-    for i in options:
-        print(options)
+    for i, opt in enumerate(options):
+        print(f'{i+1}) {opt}')
     x = input('\n')
     for i, option in enumerate(options):
         if x.lower() == option.lower():
             return i + 1
+        
     try:
         x = int(x)
         for i, option in enumerate(options):
             if x == i:
-                return i + 1
+                return i
     except:
         return 0
     return 0

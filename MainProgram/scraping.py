@@ -9,6 +9,9 @@ from datetime import datetime as dt
 from PIL import Image
 import io
 from selenium.webdriver.chrome.options import Options
+import sys
+sys.path.insert(1, '../')
+import Utils.utils
 
 french_labels = ['french', 'lamp', 'france',
 'lamps', 'european', 'art deco', 'liberty', 

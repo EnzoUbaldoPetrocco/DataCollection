@@ -4,6 +4,9 @@ import matplotlib.patches as patches
 import pathlib
 import os
 import numpy as np
+import sys
+sys.path.insert(1, '../')
+import Utils.utils
 
 count = 0
 
@@ -13,7 +16,6 @@ class Crop:
         file_name = file_name.split('.')[0] + f'_{count}.' + file_name.split('.')[1] 
         cv2.imwrite(file_name, image)
         print('Image saved!')
-
 
     def mouse_event(self, event):
             print('x: {} and y: {}'.format(event.xdata, event.ydata))
@@ -34,32 +36,14 @@ class Crop:
         plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)),plt.grid(),plt.ion(),plt.show()
         crop = 1
 
-        choice1 = input('Would you like to crop this image? (0/1)  ')
-        try:
-            choice1 = int(choice1)
-            if choice1!=1:
-                crop = 0
-                save_ = input('Do you want to save the image?  ')
-                try:
-                    save_ = int(save_)
-                    if save_:
-                        count = count + 1
-                        # Save the cropped image
-                        self.save_image(img, file_name, count)
-                except:
-                    ...
-                
-        except:
+        choice1 = Utils.utils.accept('Would you like to crop this image? ')
+        if not choice1:
             crop = 0
-            save_ = input('Do you want to save the image?  ')
-            try:
-                save_ = int(save_)
-                if save_:
-                    count = count + 1
-                    # Save the cropped image
-                    self.save_image(img, file_name, count)
-            except:
-                ...
+            save_ = Utils.utils.accept('Do you want to save the image?  ')
+            if save_:
+                count = count + 1
+                # Save the cropped image
+                self.save_image(img, file_name, count)
             
         while(crop):
             while(not ok):
@@ -80,9 +64,9 @@ class Crop:
                 ax.add_patch(rect_dr)
                 plt.show()
 
-                like = input('Do you like this cut? (y/n) ')
+                like = Utils.utils.accept('Do you like this cut? (y/n) ')
                 plt.close()
-                if like == 'y' or like == '1':
+                if like:
                     # Crop the image
                     cropped_img = img[int(y1):int(y2), int(x1):int(x2)]
                     count = count + 1
@@ -91,18 +75,11 @@ class Crop:
                     ok = True
                 else:
                     continue
-            n = input('Do you want to crop another image? (0/1, default or 0 = skip) ')
-            try:
-                n = int(n)
-                if n:
-                    ok = False
-                else:
-                    crop = 0
-                    
-            except:
-                print('Default: skip image')
+            n = Utils.utils.accept('Do you want to crop another image? (0/1, default or 0 = skip) ')
+            if n:
+                ok = False
+            else:
                 crop = 0
-
 
     def crop(self, image, file_name):
         global count
@@ -111,33 +88,14 @@ class Crop:
         img = cv2.imread(str(image))
         plt.imshow(img),plt.grid(),plt.ion(),plt.show()
         crop = 1
-        choice1 = input('Would you like to crop this image? (0/1)  ')
-        try:
-            choice1 = int(choice1)
-            if choice1!=1:
-                crop = 0
-                save_ = input('Do you want to save the image?  ')
-                try:
-                    save_ = int(save_)
-                    if save_:
-                        count = count + 1
-                        # Save the cropped image
-                        self.save_image(img, file_name, count)
-                except:
-                    ...
-                
-        except:
+        choice1 = Utils.utils.accept('Would you like to crop this image? ')
+        if not choice1:
             crop = 0
-            save_ = input('Do you want to save the image?  ')
-            try:
-                save_ = int(save_)
-                if save_:
-                    count = count + 1
-                    # Save the cropped image
-                    self.save_image(img, file_name, count)
-            except:
-                ...
-        
+            save_ = Utils.utils.accept('Do you want to save the image?  ')
+            if save_:
+                count = count + 1
+                # Save the cropped image
+                self.save_image(img, file_name, count)
         while(crop):
             while(not ok):
                 # Define the coordinates of the region you want to cut
@@ -155,9 +113,9 @@ class Crop:
                 ax.add_patch(rect_dr)
                 plt.show()
 
-                like = input('Do you like this cut? (y/n) ')
+                like = Utils.utils.accept('Do you like this cut? (y/n) ')
                 plt.close()
-                if like == 'y':
+                if like:
                     # Crop the image
                     cropped_img = img[y:y+h, x:x+w]
                     file_name = file_name.split('.')[0] + f'_{count}.' + file_name.split('.')[1] 
@@ -167,15 +125,10 @@ class Crop:
                     ok = True
                 else:
                     continue
-            n = input('Do you want to crop another image? (0/1, default or 0 = skip) ')
-            try:
-                n = int(n)
-                if n:
-                    ok = False
-                else:
-                    crop = 0
-            except:
-                print('Default: skip image')
+            n = Utils.utils.accept('Do you want to crop another image? (0/1, default or 0 = skip) ')
+            if n:
+                ok = False
+            else:
                 crop = 0
             
     def __init__(self, cursor_mode):

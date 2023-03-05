@@ -3,15 +3,14 @@ import labeling
 import remove_bg
 import scraping
 import similar_images
+import sys
+sys.path.insert(1, '../')
+import Utils.utils
 
 def menu():
-    x = input('1) Scraping\n2) Deleting copies of images\n' +
-    '3) Comparing and deleting similar images\n4) Crop Images\n5) '+ 
-    'Remove Background \n6) Labeling \n7) Quit (default):\n ' )
-    try:
-        x = int(x)
-    except:
-        x = 6
+    opts = ['Scraping', 'Deleting copies', 'Comparing similar',
+            'Crop', 'Remove Background', 'Labeling', 'Quit' ]
+    x = Utils.utils.options(opts)
     if x>=1 and x<=6:
         enter = True
     else:
@@ -19,7 +18,6 @@ def menu():
     return enter, x
 
 # This is a menu like main
-print('Hi, what would you like to do?')
 enter, x = menu()
 while(enter):
     if x == 1:

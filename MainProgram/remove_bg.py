@@ -10,7 +10,9 @@ import matplotlib.patches as patches
 from matplotlib import animation
 import os
 from copy import deepcopy
-
+import sys
+sys.path.insert(1, '../')
+import Utils.utils
 
 class RemoveBackGround:
     # Manual Background Removing
@@ -262,7 +264,7 @@ class RemoveBackGround:
         for i in range(n):
             path = input('Enter the path: ')
             for typ in types:
-                image_paths.extend(pathlib.Path(path).glob(typ))
+                image_paths.extend(sorted(pathlib.Path(path).glob(typ)))
         destination_folder = input('Enter the destination folder: ')
 
         if not os.path.exists(destination_folder):
