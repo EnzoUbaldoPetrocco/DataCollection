@@ -194,7 +194,7 @@ class Crop:
                 os.makedirs(destination_folder)
 
         
-        count = 1373
+        count = 0
         for i, im in enumerate(image_paths):
             print(f'Image number {i}')
             if cursor_mode:

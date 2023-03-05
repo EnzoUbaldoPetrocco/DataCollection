@@ -12,7 +12,7 @@ def menu():
         x = int(x)
     except:
         x = 6
-    if x>=1 and x<=5:
+    if x>=1 and x<=6:
         enter = True
     else:
         enter = False

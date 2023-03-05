@@ -9,19 +9,19 @@ class Labeling:
         path = input('Enter the path to the images: ')
         dest_path = input('Enter the destination path: ')
 
-        n_classes = int(input('How many classes?'))
+        n_classes = int(input('How many classes? '))
         labels = []
-        for i in n_classes:
-            label = input('Enter label name')
+        for i in range(n_classes):
+            label = input('Enter label name ')
             labels.append(label)
 
         if not os.path.exists(dest_path):
             print(f'Making directory: {str(dest_path)}')
             os.makedirs(dest_path)
 
-        for label in n_classes:
+        for label in labels:
             if not os.path.exists(dest_path + '/' + label):
-                print(f'Making directory: {str(dest_path)}/on{str(label)}')
+                print(f'Making directory: {str(dest_path)}/{str(label)}')
                 os.makedirs(dest_path + '/' + label)
 
         if not os.path.exists(dest_path + '/dont_know'):
@@ -39,14 +39,14 @@ class Labeling:
 
         print('In this program the order of labels are numbered, so that' + 
         'you can refer to a label using the position (starting from 0).\n' +
-        'At the end of this list of labels I have added the don\'t_know label.')
+        'At the end of this list of labels I have added the don\'t_know label. ')
         # pairs represents a 2D list (map) that is needed to associate an image to a label
         pairs = []
         # Show images
         for img in images:
             plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)),plt.ion(),plt.show()
             res = input('Select the label, default key will be put in the '+ 
-            'don\'t_know folder')
+            'don\'t_know folder ')
             try: 
                 res = int(res)
             except:
