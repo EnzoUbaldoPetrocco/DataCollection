@@ -8,6 +8,7 @@ import Utils.utils
 
 class Labeling:
     def __init__(self):
+        plt.rcParams['figure.dpi'] = 125
         # Get images paths
         path = input('Enter the path to the images: ')
         dest_path = input('Enter the destination path: ')
@@ -36,26 +37,23 @@ class Labeling:
 
         for pat in image_paths:
             images.append(cv2.imread(str(pat)))
-
+        # Shift to insert anytime the program is interrupted
+        shift = 0
+        images = images[shift:len(images) - 1]
         print('In this program the order of labels are numbered, so that' + 
         'you can refer to a label using the position (starting from 0).\n' +
         'At the end of this list of labels I have added the don\'t_know label. ')
-        # pairs represents a 2D list (map) that is needed to associate an image to a label
-        pairs = []
         # Show images
         for j, img in enumerate(images):
-            print(f'{j}/{len(images)}')
+            print(f'{j+1}/{len(images)}')
+            print(f'Image {image_paths[shift + j+1]}')
             plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)),plt.ion(),plt.show()
             res = Utils.utils.options(labels)
-            pairs.append([img, res])
-            plt.close()
+            plt.close('all')
+            destination = dest_path + f'/{labels[res-1]}/' + f'image_{shift + j}.jpg'
+            cv2.imwrite(destination, img)
+            print(f'Image saved in {destination}')
 
-        for i, pair in enumerate(pairs):
-            print(i)
-            print(pair)
-            destination = dest_path + f'/{labels[pair[1]-1]}/' + f'image_{i}.jpg'
-            print(destination)
-            cv2.imwrite(destination, pair[0])
             
 
         

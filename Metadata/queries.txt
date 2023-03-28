@@ -26,6 +26,7 @@ indian:
 - traditional indian house with carpet
 - traditional indian house floor
 - traditional indian house interior
+- antique indian house interior
 
 japanese: 
 - traditional japanese house with carpet

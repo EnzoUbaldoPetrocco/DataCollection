@@ -14,7 +14,7 @@ def accept(text):
     except:
         return False
     
-def options(options):
+def options(options, default=1):
     if options == None:
         raise Exception('Options is None')
     if len(options) == 0:
@@ -22,16 +22,15 @@ def options(options):
     print('Which one would you like to choose?')
     for i, opt in enumerate(options):
         print(f'{i+1}) {opt}')
-    x = input('\n')
+    x = input('')
     for i, option in enumerate(options):
         if x.lower() == option.lower():
             return i + 1
-        
     try:
         x = int(x)
-        for i, option in enumerate(options):
-            if x == i:
-                return i
+        if x >= 1 and x <= len(options):
+            return x
+        else:
+            return default
     except:
-        return 0
-    return 0
+        return default

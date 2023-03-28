@@ -10,7 +10,7 @@ import Utils.utils
 def menu():
     opts = ['Scraping', 'Deleting copies', 'Comparing similar',
             'Crop', 'Remove Background', 'Labeling', 'Quit' ]
-    x = Utils.utils.options(opts)
+    x = Utils.utils.options(opts, 7)
     if x>=1 and x<=6:
         enter = True
     else:
@@ -25,7 +25,7 @@ while(enter):
     elif x == 2:
         similar_images.SimilarImages(True)
     elif x == 3:
-        similar_images.SimilarImages(True)
+        similar_images.SimilarImages(False)
     elif x == 4:
         y = int(input('Would you like to use the cursor? (default is manually) (0/1)\n'))
         crop.Crop(y)

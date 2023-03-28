@@ -38,7 +38,7 @@ class RemoveBackGround:
         return indices
             
     def reset(self, event):
-        self.dummy = deepcopy(self.image)
+        self.dummy = deepcopy(self.original_image)
         print('Reset')
 
     def mouse_click(self, event):
@@ -50,14 +50,14 @@ class RemoveBackGround:
     def updatefig(self, *args):
         x, y = self.x, self.y
         if self.mouse:
-            if int(x)>0 and int(x)<=np.shape(self.dummy)[0] and int(y)>0 and int(y)<=np.shape(self.dummy)[1]:
-                indices = self.draw_discrete_circle_with_boundaries(x, y,self.amplitude,np.shape(self.dummy)[0],np.shape(self.dummy)[1])
-                if not self.invert:
-                    for i in indices:     
-                        self.dummy[i[1],i[0],:] = [255,255,255]
-                else:
-                    for i in indices:
-                        self.dummy[i[1],i[0]] = self.image[i[1],i[0]]
+            #if int(x)>=0 and int(x)<np.shape(self.dummy)[1] and int(y)>=0 and int(y)<np.shape(self.dummy)[0]:
+            indices = self.draw_discrete_circle_with_boundaries(x, y,self.amplitude,np.shape(self.dummy)[1],np.shape(self.dummy)[0])
+            if not self.invert:
+                for i in indices:     
+                    self.dummy[i[1],i[0],:] = [255,255,255]
+            else:
+                for i in indices:
+                    self.dummy[i[1],i[0]] = self.original_image[i[1],i[0]]
         self.im.set_data(self.dummy)
         return self.im,
 
@@ -99,7 +99,7 @@ class RemoveBackGround:
         self.fig.canvas.mpl_connect('button_release_event', self.mouse_release)
         plt.connect('motion_notify_event', self.mouse_move)
         return_value = input('Press enter to confirm the choice  ')
-        plt.close()
+        plt.close('all')
         plt.ioff()
     
     # Background Removing Algorithms
@@ -128,11 +128,13 @@ class RemoveBackGround:
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         # Multiply the original image with the mask to obtain the foreground
+        mask = np.where(mask < 127, 0, 255)
         foreground = img * mask[:, :, np.newaxis]
         return foreground
 
     def grab_cut(self, img, automated):
-        plt.imshow(img),plt.grid(),plt.show()
+        plt.ion()
+        #plt.imshow(img),plt.grid(),plt.show()
         assert img is not None, "file could not be read, check with os.path.exists()"
         mask = np.zeros(img.shape[:2],np.uint8)
         bgdModel = np.zeros((1,65),np.float64)
@@ -181,7 +183,7 @@ class RemoveBackGround:
     def watershed(self, img):
         # Convert the image to grayscale and apply Gaussian blur
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (7, 7), 0)
+        blurred = cv2.GaussianBlur(gray, (5,5), 0)
         # Perform Otsu thresholding to obtain a binary image
         _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         # Create a marker image using connected component analysis
@@ -194,10 +196,6 @@ class RemoveBackGround:
         foreground = img * mask[:, :, np.newaxis]
 
         result = self.add_blank_screen(foreground, img)
-        # Create a blank background
-        #background = np.zeros_like(img, dtype=np.uint8)
-        # Combine the foreground and background to get the final result
-        #result = foreground + background
         return result
 
     def k_means_clustering(self, img):
@@ -205,7 +203,7 @@ class RemoveBackGround:
         rows, cols, channels = img.shape
         data = img.reshape(rows * cols, channels)
         # Perform K-Means clustering on the image data
-        K = 8
+        K = 5
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
         _, labels, centers = cv2.kmeans(data.astype(np.float32), K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
         # Assign the cluster with the lowest intensity mean value to the background
@@ -217,16 +215,14 @@ class RemoveBackGround:
         
         return result
     
-    def image_selection(self, modified_images, original_image):
+    def image_selection(self, modified_images, original_image, algorithms):
         # Plot the images in order to help the user to decided which image is the best
         #col = 0
         n_row = ceil((len(modified_images) + 1)/2)
-        print(len(modified_images))
         #row = 0
         plt.ioff()
         with plt.ion():
             for i, mod_im in enumerate(modified_images):
-                print('here')
                 ax = plt.subplot(n_row,2,i+1)
                 ax.set_title(f'Algorithm {i+1}'), ax.set_xticks([]), ax.set_yticks([])
                 plt.imshow(mod_im)
@@ -234,29 +230,43 @@ class RemoveBackGround:
             ax.set_title(f'Original Image')
             ax.set_xticks([]), ax.set_yticks([])
             plt.imshow(original_image)
-        choice = int(input('Which image do you want to keep? (press an integer for algorithms or -1 for the original)\n' + 
-        'algorithms are applied in the same order as you have chosen before  '))
-        plt.close()
+        print('Which image do you want to keep? (press an integer for algorithms or -1 for the original)\n' + 
+        'algorithms are applied in the same order as you have chosen before  ')
+        choice = Utils.utils.options(algorithms, default = -1)
+        plt.close('all')
         plt.ioff()
         return choice
 
     def automated_algorithm_selection(self, img_to_save, algorithms, automated, original_image, modified_images):
         for algorithm in algorithms:
             if self.compare(algorithm, '1'):
-                modified_images.append(self.mog2(img_to_save))
+                try:
+                    modified_images.append(self.mog2(img_to_save))
+                except:
+                    print('mog2 did not worked')
             elif self.compare(algorithm, '2'):
-                modified_images.append(self.k_means_clustering(img_to_save))
+                try:
+                    modified_images.append(self.k_means_clustering(img_to_save))
+                except:
+                    print('k_means_clustering did not worked')
             elif self.compare(algorithm, '3'):
-                modified_images.append(self.grab_cut(img_to_save, automated))
+                try:
+                    modified_images.append(self.grab_cut(img_to_save, automated))
+                except:
+                    print('grab_cut did not worked')
             else:
                 modified_images.append(original_image)
-        choice = self.image_selection(modified_images, original_image)
+        options = []
+        for i, alg in enumerate(algorithms):
+            options.append(str(i+1))
+        choice = self.image_selection(modified_images, original_image, options)
         if choice == -1:
             return original_image
         img_to_save = modified_images[choice-1]
         return img_to_save
 
     def __init__(self, automated = True):
+        plt.rcParams['figure.dpi'] = 125
         n = int(input('Give me the number of paths you want to include: '))
         image_paths = []
         images_to_be_saved = []
@@ -276,42 +286,34 @@ class RemoveBackGround:
         '1) mog2 \n2) k_means_clustering \n3) grab_cut\n')
 
         # Remove spaces
-        
         algorithms = x.split(',')
-        # For each image I would like to:
-        # - decide if you want to apply the algorithms
-        # - apply the algorithms
-        # - decide if which algorithms generates the desired output
-        # - decide if you want to apply another algorithm or continue
+        
         for i, img in enumerate(image_paths):
+            print(f'{i+1}/{len(image_paths)}')
             original_image = cv2.imread(str(img))
             original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
             img_to_save = original_image
             plt.imshow(original_image),plt.ion(),plt.show()
             print('This is the original image.')
-            x = input('Do you want to remove the background? (y/n): ')
-            if x == 'y':
+            x = Utils.utils.accept('Do you want to remove the background? ')
+            if x:
                 remove_bool = True
             else:
                 remove_bool = False
                 images_to_be_saved.append(img_to_save)
             while(remove_bool):
-                manual_version = input('Do you want to apply background removing manually? ')
-                try:
-                    manual_version = int(manual_version)
-                except:
-                    manual_version = 0
+                manual_version = Utils.utils.accept('Do you want to apply background removing manually? ')
                 modified_images = []
                 if manual_version:
+                    self.original_image = original_image
                     self.manual_rb(img_to_save)
                     img_to_save = self.dummy
                 else:
                     img_to_save = self.automated_algorithm_selection(img_to_save, 
                                                         algorithms, automated, original_image, modified_images)
 
-                
-                x = input('Do you want to apply another algorithm? (y/n) ')
-                if x == 'y':
+                x = Utils.utils.accept('Do you want to apply another algorithm? ')
+                if x:
                     remove_bool = True
                 else:
                     remove_bool = False

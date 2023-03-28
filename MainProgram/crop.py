@@ -11,6 +11,52 @@ import Utils.utils
 count = 0
 
 class Crop:
+        
+    def blank_crop(self,img):
+        # iterate by row to have first y
+        thresh = 250
+        r,c,d = np.shape(img)
+        cond = False
+        for i in range(r):
+            for j in range(c):
+                for k in range(d):
+                    if img[i,j,k]<=thresh:
+                        if not cond:
+                            print(f'Point is {i},{j}')
+                            y1 = i
+                        cond = True
+        # iterate by columns to have first x
+        cond = False
+        for i in range(c):
+            for j in range(r):
+                for k in range(d):
+                    if img[j,i,k]<=thresh:
+                        if not cond:
+                            print(f'Point is {i},{j}')
+                            x1 = i
+                        cond = True
+        # iterate by inverted rows to have last y
+        cond = False
+        for i in range(r):
+            for j in range(c):
+                for k in range(d):
+                    if img[r-i-1,c-j-1,k]<=thresh:
+                        if not cond:
+                            print(f'Point is {r-i-1},{c-j-1}')
+                            y2 = r-i-1
+                        cond = True
+        # iterate by inverted columns to have last x
+        cond = False
+        for i in range(c):
+            for j in range(r):
+                for k in range(d):
+                    if img[r-j-1,c-i-1,k]<=thresh:
+                        if not cond:
+                            print(f'Point is {r-j-1},{c-i-1}')
+                            x2 = c-i-1
+                        cond = True
+        return [x1, y1, x2, y2]
+
 
     def save_image(self, image, file_name, count):
         file_name = file_name.split('.')[0] + f'_{count}.' + file_name.split('.')[1] 
@@ -47,16 +93,31 @@ class Crop:
             
         while(crop):
             while(not ok):
-                # Define the coordinates of the region you want to cut
-                #x, y, w, h = 50, 60, 200, 300
-                ans_1 = input('Click on left up angle and click enter\n')
-                x1 = self.x
-                y1 = self.y
-                ans_2 = input('Click on right bottom angle and click enter\n')
-                x2 = self.x
-                y2 = self.y
-
+                white = Utils.utils.accept('Is this a white background image? ')
+                if white:
+                    x1,y1,x2,y2 = self.blank_crop(img)
+                else:
+                    # Define the coordinates of the region you want to cut
+                    ans_1 = input('Click on left up angle and click enter\n')
+                    x1 = self.x
+                    y1 = self.y
+                    ans_2 = input('Click on right bottom angle and click enter\n')
+                    x2 = self.x
+                    y2 = self.y
+                if x1 == None:
+                    x1 = 0
+                if x2 == None:
+                    x2 = 0
+                if y1 == None:
+                    y1 = 0
+                if y2 == None:
+                    y2 = 0
                 rect = (x1,y1,x2,y2)
+                if x1 >= x2 or y1 >= y2:
+                    x1 = 0
+                    y1 = 0
+                    x2 = np.shape(img)[0]
+                    y2 = np.shape(img)[1]
                 fig, ax = plt.subplots()
                 # Display the image
                 ax.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)), plt.grid()
@@ -75,11 +136,13 @@ class Crop:
                     ok = True
                 else:
                     continue
+                
             n = Utils.utils.accept('Do you want to crop another image? (0/1, default or 0 = skip) ')
             if n:
                 ok = False
             else:
                 crop = 0
+                
 
     def crop(self, image, file_name):
         global count
@@ -114,7 +177,7 @@ class Crop:
                 plt.show()
 
                 like = Utils.utils.accept('Do you like this cut? (y/n) ')
-                plt.close()
+                plt.close('all')
                 if like:
                     # Crop the image
                     cropped_img = img[y:y+h, x:x+w]
@@ -133,6 +196,7 @@ class Crop:
             
     def __init__(self, cursor_mode):
         global count
+        plt.rcParams['figure.dpi'] = 100
         n = int(input('Give me the number of paths you want to include: '))
         image_paths = []
         types = ('*.png', '*.jpg', '*.jpeg')
@@ -148,10 +212,11 @@ class Crop:
 
         
         count = 0
+        image_paths = image_paths[count:len(image_paths)]
         for i, im in enumerate(image_paths):
-            print(f'Image number {i}')
+            print(f'{i+1}/{len(image_paths)}')
             if cursor_mode:
                 self.cursor_crop(im, destination_folder +  f'/image.jpeg')
             else:
                 self.crop(im, destination_folder + f'/image.jpeg')
-            plt.close()
+            plt.close('all')

@@ -239,8 +239,10 @@ class SimilarImages:
         return similar_images
 
     def __init__(self, delete_all_images):
-        equal_threshold = 0.999
+        plt.rcParams['figure.dpi'] = 125
+        equal_threshold = 0.95
         n = int(input('Give me the number of paths you want to include: '))
+        
         image_paths = []
         types = ('*.png', '*.jpg', '*.jpeg')
         for i in range(n):
